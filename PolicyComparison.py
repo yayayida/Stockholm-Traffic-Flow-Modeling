@@ -104,6 +104,13 @@ def run_scenario(scenario_name, G_car, G_pt, landuse, zones, param, param_carown
         Vslow = parameter[6] + (parameter[7] * dist)
         Vj = parameter[9] * np.log(emp)
         
+        # Clip utility values to prevent overflow in exp()
+        # Utilities larger than 700 would cause overflow
+        MAX_UTILITY = 500
+        Vcar = np.clip(Vcar, -MAX_UTILITY, MAX_UTILITY)
+        Vpt = np.clip(Vpt, -MAX_UTILITY, MAX_UTILITY)
+        Vslow = np.clip(Vslow, -MAX_UTILITY, MAX_UTILITY)
+        
         # Car owners - three modes available
         exp_car = np.exp(Vcar / mu)
         exp_pt = np.exp(Vpt / mu)
@@ -291,13 +298,20 @@ def compare_scenarios(baseline_results, policy_results, carparking, transitprice
     VKT_reduction = VKT_base - VKT_policy
     VKT_reduction_pct = (VKT_reduction / VKT_base * 100) if VKT_base > 0 else 0
     
-    # Externality costs
+    # Externality costs - coefficients from Effect.py
+    # These coefficients represent cost per vehicle-km in euros
+    WAITING_TIME_COST_COEF = 0.01    # €/VKT
+    ACCIDENT_COST_COEF = 0.25        # €/VKT
+    NOISE_COST_COEF = 0.081          # €/VKT
+    EMISSION_COST_COEF = 0.004       # €/VKT
+    CO2_COST_COEF = 3.15 * 0.085 * 1.5  # €/VKT (CO2 price * fuel consumption * factor)
+    
     def calc_externalities(VKT):
-        wt = 0.01 * VKT
-        acc = 0.25 * VKT
-        noise = 0.081 * VKT
-        emission = 0.004 * VKT
-        co2 = 3.15 * 0.085 * 1.5 * VKT
+        wt = WAITING_TIME_COST_COEF * VKT
+        acc = ACCIDENT_COST_COEF * VKT
+        noise = NOISE_COST_COEF * VKT
+        emission = EMISSION_COST_COEF * VKT
+        co2 = CO2_COST_COEF * VKT
         return wt + acc + noise + emission + co2
     
     ext_base = calc_externalities(VKT_base * 1000)

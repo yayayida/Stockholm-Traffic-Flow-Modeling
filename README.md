@@ -14,9 +14,11 @@ This repository contains a transportation demand and assignment model for Stockh
 **`PolicyComparison.py`** - A comprehensive script that demonstrates how transit service improvements can enhance system-wide performance.
 
 ### Policy Intervention
-The script implements a policy to reduce waiting times on major transit corridors:
-- **50% reduction** on core T-bana (metro) lines connecting to Centralen
-- **40% reduction** on key suburban connections
+The script implements a policy to reduce waiting times on major transit corridors by increasing service frequency:
+- **50% reduction in waiting time** on core T-bana (metro) lines connecting to Centralen (simulating doubled frequency)
+- **40% reduction in waiting time** on key suburban connections (simulating 67% frequency increase)
+
+This represents improved service frequency, resulting in shorter average waiting times for passengers.
 
 ### Results Summary
 
