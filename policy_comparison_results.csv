@@ -1,0 +1,8 @@
+Metric,Baseline,Policy,Change
+Transit Trips,"316,535","341,715","+25,179"
+Transit Mode Share (%),39.57%,42.71%,+3.15pp
+Car Trips,"409,949","393,023","-16,925"
+Car Mode Share (%),51.24%,49.13%,-2.12pp
+Expected Utility,"8,775,100","8,855,120","+80,020 (+0.91%)"
+Distance Travelled (1000 km),71364,68353,-3012 (-4.2%)
+Total Externalities (€),"53,282,307","51,033,736","-2,248,571 (-4.2%)"
