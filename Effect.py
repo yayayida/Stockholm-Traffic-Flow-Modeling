@@ -1,27 +1,27 @@
+import pandas
+import geopandas
 import numpy as np
-import pandas as pd
-from tabulate import tabulate
-def Effect(v_car, v_pt, v_slow, dist, carparking, transitprice, EU):
+
+def get_landuse_and_zones(parameter):
+    #### Loading Zone Data ####
+    zones = geopandas.read_file("zones.geojson")
+       
+    ####to create a column with centroids ####
+    centroidFunction = lambda row: (row['geometry'].centroid.y, row['geometry'].centroid.x)
+    zones['centroid'] = zones.apply(centroidFunction, axis=1)
     
-    # Here, calculate the vehicle kilometers traveled and externalities    
-    VKT = dist * v_car
-    wt = 0.01 * VKT
-    acc = 0.25 * VKT
-    noise = 0.081 * VKT
-    emission = 0.004 * VKT
-    co2 = 3.15 * 0.085 * 1.5 * VKT
-    parking_rev = v_car * carparking
-    transit_rev = v_pt * transitprice
+    #### Loading Landuse Data ####
+    landuse = pandas.read_csv("landuse.csv", sep=";")
+
+    ##parameter
+    constant, beta_inc, beta_dummy = parameter
+    ##Calculate Utility of owning a car
+    V_car = constant + beta_inc * landuse['inc'] + beta_dummy * landuse['citycenter']
+    ##Binary Logit
+    landuse['car_ownership'] = np.exp(V_car) / (1 + np.exp(V_car))
     
+    # Add zone information to landuse data
+    zones.set_index('area', inplace=True)
+    landuse = landuse.join(zones, on='area')
     
-    # create the table with externalities 
-    table = {
-        "Car Trips"            : round(np.sum(v_car)),
-        "Transit Trips"       : round(np.sum(v_pt)),
-        "Slow Trips"           : round(np.sum(v_slow)),
-        "Total trips"          : round(np.sum(v_car)+np.sum(v_pt)+np.sum(v_slow)),
-        "Distance Travelled"   : round(np.sum(VKT)/1000),
-        "Expected Utility"     : round(np.sum(EU))
-    }
-    
-    return pd.DataFrame(table.values(), index=list(table.keys()), columns=['INFORMATION'])
+    return landuse, zones   
